@@ -33,9 +33,14 @@ namespace DAOs
             }
         }
 
-        public List<TEntity> GetAll()
+        public IQueryable<TEntity> GetAll()
         {
-            return _dbSet.ToList();
+            return _dbSet;
+        }
+
+        public TEntity? GetFirst(Func<TEntity, bool> predicate)
+        {
+            return _dbSet.FirstOrDefault(predicate);
         }
 
         public TEntity? GetById(TKey id)

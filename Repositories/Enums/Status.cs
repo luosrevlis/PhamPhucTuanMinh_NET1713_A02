@@ -1,4 +1,4 @@
-﻿namespace DAOs
+﻿namespace Repositories.Enums
 {
     public enum Status : byte
     {
