@@ -5,7 +5,7 @@ namespace DAOs
 {
     public class RoomTypeDAO : BaseDAO<RoomType, int>
     {
-        public RoomTypeDAO(DbContext context) : base(context)
+        public RoomTypeDAO(FuminiHotelManagementContext context) : base(context)
         {
         }
     }

@@ -1,4 +1,4 @@
-﻿namespace Repositories.Enums
+﻿namespace BusinessObjects.Enums
 {
     public enum Status : byte
     {

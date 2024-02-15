@@ -5,7 +5,7 @@ namespace DAOs
 {
     public class CustomerDAO : BaseDAO<Customer, int>
     {
-        public CustomerDAO(DbContext context) : base(context)
+        public CustomerDAO(FuminiHotelManagementContext context) : base(context)
         {
         }
     }

@@ -1,6 +1,6 @@
 ﻿using BusinessObjects;
+using BusinessObjects.Enums;
 using DAOs;
-using Repositories.Enums;
 
 namespace Repositories.Impl
 {

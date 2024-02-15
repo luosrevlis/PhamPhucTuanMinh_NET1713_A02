@@ -1,7 +1,7 @@
 ﻿using BusinessObjects;
+using BusinessObjects.Enums;
 using DAOs;
 using Microsoft.EntityFrameworkCore;
-using Repositories.Enums;
 
 namespace Repositories.Impl
 {
