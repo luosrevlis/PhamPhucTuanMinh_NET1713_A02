@@ -1,7 +1,14 @@
+using DAOs;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddDbContext<FuminiHotelManagementContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("FuMiniHotelManagementDb"));
+});
 
 var app = builder.Build();
 

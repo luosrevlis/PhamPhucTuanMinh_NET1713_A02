@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using BusinessObjects;
+using Microsoft.Extensions.Options;
 
 namespace DAOs;
 
@@ -8,10 +9,15 @@ public partial class FuminiHotelManagementContext : DbContext
     public FuminiHotelManagementContext()
     { 
     }
-
     public FuminiHotelManagementContext(DbContextOptions<FuminiHotelManagementContext> options): base(options)
     {
     }
+
+    /*protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseSqlServer("server=.;database=FUMiniHotelManagement;uid=sa;pwd=12345;TrustServerCertificate=True");
+        base.OnConfiguring(optionsBuilder);
+    }*/
 
     public virtual DbSet<BookingDetail> BookingDetails { get; set; }
 
