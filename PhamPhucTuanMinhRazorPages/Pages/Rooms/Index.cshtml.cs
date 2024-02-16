@@ -1,33 +1,71 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using BusinessObjects;
-using DAOs;
+using BusinessObjects.Enums;
+using PhamPhucTuanMinhRazorPages.Filters;
+using Repositories;
 
 namespace PhamPhucTuanMinhRazorPages.Pages.Rooms
 {
+    [Admin]
     public class IndexModel : PageModel
     {
-        private readonly DAOs.FuminiHotelManagementContext _context;
+        private readonly IRoomRepository _roomRepository;
 
-        public IndexModel(DAOs.FuminiHotelManagementContext context)
+        public IndexModel(IRoomRepository roomRepository)
         {
-            _context = context;
+            _roomRepository = roomRepository;
         }
 
-        public IList<RoomInformation> RoomInformation { get;set; } = default!;
+        public IList<RoomInformation> RoomInformation { get; set; } = new List<RoomInformation>();
 
-        public async Task OnGetAsync()
+        [BindProperty]
+        public string? RoomNumber { get; set; }
+        [BindProperty]
+        public string? RoomDetailDescription { get; set; }
+        [BindProperty]
+        public int? RoomMaxCapacity { get; set; }
+        [BindProperty]
+        public int? RoomPriceFrom { get; set; }
+        [BindProperty]
+        public int? RoomPriceTo { get; set; }
+
+
+        public void OnGet()
         {
-            if (_context.RoomInformations != null)
+            RoomInformation = _roomRepository.GetAllRooms();
+        }
+
+        public void OnPost()
+        {
+            RoomInformation = _roomRepository.FindRooms(room =>
             {
-                RoomInformation = await _context.RoomInformations
-                .Include(r => r.RoomType).ToListAsync();
-            }
+                if (room.RoomStatus == (byte)Status.Deleted)
+                {
+                    return false;
+                }
+                if (!string.IsNullOrEmpty(RoomNumber) && !room.RoomNumber.Contains(RoomNumber))
+                {
+                    return false;
+                }
+                if (!string.IsNullOrEmpty(RoomDetailDescription) && !(room.RoomDetailDescription ?? string.Empty).Contains(RoomDetailDescription))
+                {
+                    return false;
+                }
+                if (RoomMaxCapacity != null && room.RoomMaxCapacity != RoomMaxCapacity)
+                {
+                    return false;
+                }
+                if (RoomPriceFrom != null && room.RoomPricePerDay < RoomPriceFrom)
+                {
+                    return false;
+                }
+                if (RoomPriceTo != null && room.RoomPricePerDay > RoomPriceTo)
+                {
+                    return false;
+                }
+                return true;
+            });
         }
     }
 }

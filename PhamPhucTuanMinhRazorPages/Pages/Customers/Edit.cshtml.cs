@@ -59,6 +59,7 @@ namespace PhamPhucTuanMinhRazorPages.Pages.Customers
             {
                 return NotFound();
             }
+            customerToUpdate.EmailAddress = Customer.EmailAddress;
             customerToUpdate.CustomerFullName = Customer.CustomerFullName;
             customerToUpdate.Telephone = Customer.Telephone;
             customerToUpdate.CustomerBirthday = Customer.CustomerBirthday;

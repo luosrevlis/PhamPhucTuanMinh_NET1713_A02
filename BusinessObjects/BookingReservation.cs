@@ -17,5 +17,5 @@ public partial class BookingReservation
 
     public virtual ICollection<BookingDetail> BookingDetails { get; set; } = new List<BookingDetail>();
 
-    public virtual Customer Customer { get; set; } = null!;
+    public virtual Customer Customer { get; set; } = new();
 }

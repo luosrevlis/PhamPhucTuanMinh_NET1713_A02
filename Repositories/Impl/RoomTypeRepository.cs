@@ -16,5 +16,10 @@ namespace Repositories.Impl
         {
             return _roomTypeDAO.GetAll().ToList();
         }
+
+        public RoomType? GetRoomTypeById(int id)
+        {
+            return _roomTypeDAO.GetById(id);
+        }
     }
 }

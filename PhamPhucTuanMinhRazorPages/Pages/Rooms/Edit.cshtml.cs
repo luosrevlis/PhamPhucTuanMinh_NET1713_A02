@@ -1,78 +1,73 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using BusinessObjects;
-using DAOs;
+using PhamPhucTuanMinhRazorPages.Filters;
+using Repositories;
 
 namespace PhamPhucTuanMinhRazorPages.Pages.Rooms
 {
+    [Admin]
     public class EditModel : PageModel
     {
-        private readonly DAOs.FuminiHotelManagementContext _context;
+        private readonly IRoomRepository _roomRepository;
+        private readonly IRoomTypeRepository _roomTypeRepository;
 
-        public EditModel(DAOs.FuminiHotelManagementContext context)
+        public EditModel(IRoomRepository roomRepository, IRoomTypeRepository roomTypeRepository)
         {
-            _context = context;
+            _roomRepository = roomRepository;
+            _roomTypeRepository = roomTypeRepository;
         }
 
         [BindProperty]
-        public RoomInformation RoomInformation { get; set; } = default!;
+        public RoomInformation RoomInformation { get; set; } = new();
 
-        public async Task<IActionResult> OnGetAsync(int? id)
+        public IActionResult OnGet(int? id)
         {
-            if (id == null || _context.RoomInformations == null)
+            if (id == null)
             {
                 return NotFound();
             }
-
-            var roominformation =  await _context.RoomInformations.FirstOrDefaultAsync(m => m.RoomId == id);
-            if (roominformation == null)
+            var room = _roomRepository.FindRoomById((int)id);
+            if (room == null)
             {
                 return NotFound();
             }
-            RoomInformation = roominformation;
-           ViewData["RoomTypeId"] = new SelectList(_context.RoomTypes, "RoomTypeId", "RoomTypeName");
+            RoomInformation = room;
+            ViewData["RoomTypeId"] = new SelectList(_roomTypeRepository.GetAllRoomTypes(), "RoomTypeId", "RoomTypeName");
             return Page();
         }
 
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see https://aka.ms/RazorPagesCRUD.
-        public async Task<IActionResult> OnPostAsync()
+        public IActionResult OnPost(int? id)
         {
-            if (!ModelState.IsValid)
+            if (id == null)
             {
+                return NotFound();
+            }
+            if (RoomInformation.RoomPricePerDay == null)
+            {
+                ModelState.AddModelError("RoomInformation.RoomPricePerDay", "Room price cannot be empty!");
+            }
+            RoomInformation.RoomType = _roomTypeRepository.GetRoomTypeById(RoomInformation.RoomTypeId)!;
+            ModelState.ClearValidationState("RoomInformation");
+            if (!TryValidateModel(RoomInformation, "RoomInformation"))
+            {
+                ViewData["RoomTypes"] = new SelectList(_roomTypeRepository.GetAllRoomTypes(), "RoomTypeId", "RoomTypeName");
                 return Page();
             }
-
-            _context.Attach(RoomInformation).State = EntityState.Modified;
-
-            try
+            var roomToUpdate = _roomRepository.FindRoomById((int)id);
+            if (roomToUpdate == null)
             {
-                await _context.SaveChangesAsync();
+                return NotFound();
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!RoomInformationExists(RoomInformation.RoomId))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return RedirectToPage("./Index");
-        }
-
-        private bool RoomInformationExists(int id)
-        {
-          return (_context.RoomInformations?.Any(e => e.RoomId == id)).GetValueOrDefault();
+            roomToUpdate.RoomNumber = RoomInformation.RoomNumber;
+            roomToUpdate.RoomDetailDescription = RoomInformation.RoomDetailDescription;
+            roomToUpdate.RoomMaxCapacity = RoomInformation.RoomMaxCapacity;
+            roomToUpdate.RoomTypeId = RoomInformation.RoomTypeId;
+            roomToUpdate.RoomType = RoomInformation.RoomType;
+            roomToUpdate.RoomPricePerDay = RoomInformation.RoomPricePerDay;
+            _roomRepository.UpdateRoom(roomToUpdate);
+            return RedirectToPage("Index");
         }
     }
 }

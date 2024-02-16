@@ -1,63 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using BusinessObjects;
-using DAOs;
+using PhamPhucTuanMinhRazorPages.Filters;
+using Repositories;
 
 namespace PhamPhucTuanMinhRazorPages.Pages.Rooms
 {
+    [Admin]
     public class DeleteModel : PageModel
     {
-        private readonly DAOs.FuminiHotelManagementContext _context;
+        private readonly IRoomRepository _roomRepository;
 
-        public DeleteModel(DAOs.FuminiHotelManagementContext context)
+        public DeleteModel(IRoomRepository roomRepository)
         {
-            _context = context;
+            _roomRepository = roomRepository;
         }
 
         [BindProperty]
-      public RoomInformation RoomInformation { get; set; } = default!;
+        public RoomInformation RoomInformation { get; set; } = new();
 
-        public async Task<IActionResult> OnGetAsync(int? id)
+        public IActionResult OnGet(int? id)
         {
-            if (id == null || _context.RoomInformations == null)
+            if (id == null)
             {
                 return NotFound();
             }
-
-            var roominformation = await _context.RoomInformations.FirstOrDefaultAsync(m => m.RoomId == id);
-
-            if (roominformation == null)
+            var room = _roomRepository.FindRoomById((int)id);
+            if (room == null)
             {
                 return NotFound();
             }
-            else 
-            {
-                RoomInformation = roominformation;
-            }
+            RoomInformation = room;
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(int? id)
+        public IActionResult OnPost(int? id)
         {
-            if (id == null || _context.RoomInformations == null)
+            if (id == null)
             {
                 return NotFound();
             }
-            var roominformation = await _context.RoomInformations.FindAsync(id);
-
-            if (roominformation != null)
-            {
-                RoomInformation = roominformation;
-                _context.RoomInformations.Remove(RoomInformation);
-                await _context.SaveChangesAsync();
-            }
-
-            return RedirectToPage("./Index");
+            _roomRepository.DeleteRoom((int)id);
+            return RedirectToPage("Index");
         }
     }
 }

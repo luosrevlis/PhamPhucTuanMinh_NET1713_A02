@@ -1,5 +1,5 @@
 ﻿@page
-@model PhamPhucTuanMinhRazorPages.Pages.Rooms.IndexModel
+@model Rooms.IndexModel
 
 @{
     ViewData["Title"] = "Index";
@@ -10,6 +10,15 @@
 <p>
     <a asp-page="Create">Create New</a>
 </p>
+<div>
+    <form method="post">
+        <p>Room number: <input asp-for="RoomNumber" /></p>
+        <p>Capacity: <input asp-for="RoomMaxCapacity" /></p>
+        <p>Price from <input asp-for="RoomPriceFrom" /> to <input asp-for="RoomPriceTo" /></p>
+        <p>Description: <input asp-for="RoomDetailDescription" /></p>
+        <input type="submit" value="Search" />
+    </form>
+</div>
 <table class="table">
     <thead>
         <tr>
@@ -17,13 +26,7 @@
                 @Html.DisplayNameFor(model => model.RoomInformation[0].RoomNumber)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.RoomInformation[0].RoomDetailDescription)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.RoomInformation[0].RoomMaxCapacity)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RoomInformation[0].RoomStatus)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.RoomInformation[0].RoomPricePerDay)
@@ -41,13 +44,7 @@
                 @Html.DisplayFor(modelItem => item.RoomNumber)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.RoomDetailDescription)
-            </td>
-            <td>
                 @Html.DisplayFor(modelItem => item.RoomMaxCapacity)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RoomStatus)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.RoomPricePerDay)
@@ -56,9 +53,9 @@
                 @Html.DisplayFor(modelItem => item.RoomType.RoomTypeName)
             </td>
             <td>
-                <a asp-page="./Edit" asp-route-id="@item.RoomId">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.RoomId">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.RoomId">Delete</a>
+                <a asp-page="Edit" asp-route-id="@item.RoomId">Edit</a> |
+                <a asp-page="Details" asp-route-id="@item.RoomId">Details</a> |
+                <a asp-page="Delete" asp-route-id="@item.RoomId">Delete</a>
             </td>
         </tr>
 }

@@ -15,7 +15,7 @@ public partial class BookingDetail
 
     public decimal? ActualPrice { get; set; }
 
-    public virtual BookingReservation BookingReservation { get; set; } = null!;
+    public virtual BookingReservation BookingReservation { get; set; } = new();
 
-    public virtual RoomInformation Room { get; set; } = null!;
+    public virtual RoomInformation Room { get; set; } = new();
 }
