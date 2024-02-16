@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BusinessObjects;
+using BusinessObjects.Enums;
 using Repositories;
 using PhamPhucTuanMinhRazorPages.Enums;
 using PhamPhucTuanMinhRazorPages.Constants;
@@ -30,7 +31,7 @@ namespace PhamPhucTuanMinhRazorPages.Pages
         {
             if (string.IsNullOrEmpty(Customer.EmailAddress) || string.IsNullOrEmpty(Customer.Password))
             {
-                ModelState.AddModelError("EmptyUidPwd", "Email and password cannot be empty!");
+                ModelState.AddModelError(string.Empty, "Email and password cannot be empty!");
             }
             if (!ModelState.IsValid)
             {
@@ -47,7 +48,7 @@ namespace PhamPhucTuanMinhRazorPages.Pages
                 HttpContext.Session.SetInt32(SessionConst.UserRoleKey, (int)UserRole.Customer);
                 return RedirectToPage("CustomerMenu");
             }
-            ModelState.AddModelError("NotFound", "Incorrect email or password!");
+            ModelState.AddModelError(string.Empty, "Incorrect email or password!");
             return Page();
         }
 
@@ -55,26 +56,22 @@ namespace PhamPhucTuanMinhRazorPages.Pages
         {
             string email = _configuration.GetSection("AdminAccount")["Username"] ?? string.Empty;
             string password = _configuration.GetSection("AdminAccount")["Password"] ?? string.Empty;
-            if (email.Equals(Customer.EmailAddress) && password.Equals(Customer.Password))
-            {
-                return true;
-            }
-            return false;
+            return email.Equals(Customer.EmailAddress) && password.Equals(Customer.Password);
         }
 
         private bool CheckCustomer()
         {
             var customer = _customerRepository.FindCustomerByEmail(Customer.EmailAddress);
-            if (customer == null)
+            if (customer == null || customer.CustomerStatus == (byte)Status.Deleted)
             {
                 return false;
             }
             string inputPassword = Customer.Password ?? string.Empty;
-            if (inputPassword.Equals(customer.Password))
+            if (!inputPassword.Equals(customer.Password))
             {
-                return true;
+                return false;
             }
-            return false;
+            return true;
         }
     }
 }

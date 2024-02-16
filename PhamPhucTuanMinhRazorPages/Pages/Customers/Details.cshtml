@@ -1,5 +1,5 @@
 ﻿@page
-@model PhamPhucTuanMinhRazorPages.Pages.Customers.DetailsModel
+@model Customers.DetailsModel
 
 @{
     ViewData["Title"] = "Details";
@@ -11,6 +11,12 @@
     <h4>Customer</h4>
     <hr />
     <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Customer.EmailAddress)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Customer.EmailAddress)
+        </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Customer.CustomerFullName)
         </dt>
@@ -24,32 +30,14 @@
             @Html.DisplayFor(model => model.Customer.Telephone)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Customer.EmailAddress)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Customer.EmailAddress)
-        </dd>
-        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Customer.CustomerBirthday)
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Customer.CustomerBirthday)
         </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Customer.CustomerStatus)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Customer.CustomerStatus)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Customer.Password)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Customer.Password)
-        </dd>
     </dl>
 </div>
 <div>
-    <a asp-page="./Edit" asp-route-id="@Model.Customer?.CustomerId">Edit</a> |
-    <a asp-page="./Index">Back to List</a>
+    <a asp-page="Edit" asp-route-id="@Model.Customer?.CustomerId">Edit</a> |
+    <a asp-page="Index">Back to List</a>
 </div>

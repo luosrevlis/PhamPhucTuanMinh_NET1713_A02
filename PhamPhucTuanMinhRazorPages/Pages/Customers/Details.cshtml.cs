@@ -1,42 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using BusinessObjects;
-using DAOs;
+using PhamPhucTuanMinhRazorPages.Filters;
+using Repositories;
 
 namespace PhamPhucTuanMinhRazorPages.Pages.Customers
 {
+    [Admin]
     public class DetailsModel : PageModel
     {
-        private readonly DAOs.FuminiHotelManagementContext _context;
+        private readonly ICustomerRepository _customerRepository;
 
-        public DetailsModel(DAOs.FuminiHotelManagementContext context)
+        public DetailsModel(ICustomerRepository customerRepository)
         {
-            _context = context;
+            _customerRepository = customerRepository;
         }
 
-      public Customer Customer { get; set; } = default!; 
+        public Customer Customer { get; set; } = new(); 
 
-        public async Task<IActionResult> OnGetAsync(int? id)
+        public IActionResult OnGet(int? id)
         {
-            if (id == null || _context.Customers == null)
+            if (id == null)
             {
                 return NotFound();
             }
-
-            var customer = await _context.Customers.FirstOrDefaultAsync(m => m.CustomerId == id);
+            var customer = _customerRepository.FindCustomerById((int)id);
             if (customer == null)
             {
                 return NotFound();
             }
-            else 
-            {
-                Customer = customer;
-            }
+            Customer = customer;
             return Page();
         }
     }

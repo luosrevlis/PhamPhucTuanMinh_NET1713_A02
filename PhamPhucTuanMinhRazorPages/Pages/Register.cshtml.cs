@@ -29,11 +29,11 @@ namespace PhamPhucTuanMinhRazorPages.Pages
         {
             if (string.IsNullOrEmpty(Customer.EmailAddress) || string.IsNullOrEmpty(Customer.Password))
             {
-                ModelState.AddModelError("EmptyUidPwd", "Email and password cannot be empty!");
+                ModelState.AddModelError(string.Empty, "Email and password cannot be empty!");
             }
             if (!CheckAdmin() || !CheckCustomer())
             {
-                ModelState.AddModelError("Existed", "Email has been registered!");
+                ModelState.AddModelError("Customer.EmailAddress", "Email has been registered!");
             }
             if (!ModelState.IsValid)
             {
@@ -55,8 +55,7 @@ namespace PhamPhucTuanMinhRazorPages.Pages
         private bool CheckAdmin()
         {
             string email = _configuration.GetSection("AdminAccount")["Username"] ?? string.Empty;
-            string password = _configuration.GetSection("AdminAccount")["Password"] ?? string.Empty;
-            if (email.Equals(Customer.EmailAddress) && password.Equals(Customer.Password))
+            if (email.Equals(Customer.EmailAddress))
             {
                 return false;
             }

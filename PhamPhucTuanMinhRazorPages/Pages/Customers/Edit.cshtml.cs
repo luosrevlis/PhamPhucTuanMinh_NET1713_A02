@@ -1,36 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using BusinessObjects;
-using DAOs;
+using PhamPhucTuanMinhRazorPages.Filters;
+using Repositories;
 
 namespace PhamPhucTuanMinhRazorPages.Pages.Customers
 {
+    [Admin]
     public class EditModel : PageModel
     {
-        private readonly DAOs.FuminiHotelManagementContext _context;
+        private readonly ICustomerRepository _customerRepository;
+        private readonly IConfiguration _configuration;
 
-        public EditModel(DAOs.FuminiHotelManagementContext context)
+        public EditModel(ICustomerRepository customerRepository, IConfiguration configuration)
         {
-            _context = context;
+            _customerRepository = customerRepository;
+            _configuration = configuration;
         }
 
         [BindProperty]
-        public Customer Customer { get; set; } = default!;
+        public Customer Customer { get; set; } = new();
 
-        public async Task<IActionResult> OnGetAsync(int? id)
+        public IActionResult OnGet(int? id)
         {
-            if (id == null || _context.Customers == null)
+            if (id == null)
             {
                 return NotFound();
             }
-
-            var customer =  await _context.Customers.FirstOrDefaultAsync(m => m.CustomerId == id);
+            var customer = _customerRepository.FindCustomerById((int)id);
             if (customer == null)
             {
                 return NotFound();
@@ -39,39 +36,54 @@ namespace PhamPhucTuanMinhRazorPages.Pages.Customers
             return Page();
         }
 
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see https://aka.ms/RazorPagesCRUD.
-        public async Task<IActionResult> OnPostAsync()
+        public IActionResult OnPost(int? id)
         {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            if (string.IsNullOrEmpty(Customer.EmailAddress))
+            {
+                ModelState.AddModelError("Customer.EmailAddress", "Email cannot be empty!");
+            }
+            if (!CheckAdmin() || !CheckCustomer())
+            {
+                ModelState.AddModelError("Customer.EmailAddress", "Email has been registered!");
+            }
             if (!ModelState.IsValid)
             {
                 return Page();
             }
-
-            _context.Attach(Customer).State = EntityState.Modified;
-
-            try
+            var customerToUpdate = _customerRepository.FindCustomerById((int)id);
+            if (customerToUpdate == null)
             {
-                await _context.SaveChangesAsync();
+                return NotFound();
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CustomerExists(Customer.CustomerId))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return RedirectToPage("./Index");
+            customerToUpdate.CustomerFullName = Customer.CustomerFullName;
+            customerToUpdate.Telephone = Customer.Telephone;
+            customerToUpdate.CustomerBirthday = Customer.CustomerBirthday;
+            _customerRepository.UpdateCustomer(customerToUpdate);
+            return RedirectToPage("Index");
         }
 
-        private bool CustomerExists(int id)
+        private bool CheckAdmin()
         {
-          return (_context.Customers?.Any(e => e.CustomerId == id)).GetValueOrDefault();
+            string email = _configuration.GetSection("AdminAccount")["Username"] ?? string.Empty;
+            if (email.Equals(Customer.EmailAddress))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private bool CheckCustomer()
+        {
+            var customer = _customerRepository.FindCustomerByEmail(Customer.EmailAddress);
+            if (customer != null)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

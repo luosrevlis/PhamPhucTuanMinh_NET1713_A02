@@ -1,59 +1,49 @@
 ﻿@page
-@model PhamPhucTuanMinhRazorPages.Pages.Customers.IndexModel
+@model Customers.IndexModel
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Customer List</h1>
 
 <p>
     <a asp-page="Create">Create New</a>
 </p>
+<div>
+    <form method="post">
+        <p>Search by name: </p>
+        <input asp-for="CustomerName" />
+        <input type="submit" value="Search" />
+    </form>
+</div>
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Customer[0].CustomerFullName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Customer[0].Telephone)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Customer[0].EmailAddress)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Customer[0].CustomerBirthday)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Customer[0].CustomerStatus)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Customer[0].Password)
-            </th>
+            <th>Email</th>
+            <th>Fullname</th>
+            <th>Telephone</th>
+            <th>Birthday</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.Customer) {
+@foreach (var item in Model.CustomerList) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.CustomerFullName)
+                @item.EmailAddress
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Telephone)
+                @item.CustomerFullName
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.EmailAddress)
+                @item.Telephone
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.CustomerBirthday)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CustomerStatus)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Password)
+                @if (item.CustomerBirthday.HasValue)
+                {
+                    @item.CustomerBirthday.Value.ToShortDateString()
+                }
             </td>
             <td>
                 <a asp-page="./Edit" asp-route-id="@item.CustomerId">Edit</a> |

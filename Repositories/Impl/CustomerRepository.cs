@@ -48,8 +48,7 @@ namespace Repositories.Impl
 
         public Customer? FindCustomerByEmail(string email)
         {
-            return _customerDao
-                .GetFirst(customer => customer.EmailAddress == email && customer.CustomerStatus != (byte)Status.Deleted);
+            return _customerDao.GetFirst(customer => customer.EmailAddress == email);
         }
 
         public List<Customer> FindCustomersByName(string name)
