@@ -17,7 +17,7 @@ namespace PhamPhucTuanMinhRazorPages.Pages.Rooms
             _roomRepository = roomRepository;
         }
 
-        public IList<RoomInformation> RoomInformation { get; set; } = new List<RoomInformation>();
+        public IList<RoomInformation> RoomList { get; set; } = new List<RoomInformation>();
 
         [BindProperty]
         public string? RoomNumber { get; set; }
@@ -33,22 +33,23 @@ namespace PhamPhucTuanMinhRazorPages.Pages.Rooms
 
         public void OnGet()
         {
-            RoomInformation = _roomRepository.GetAllRooms();
+            RoomList = _roomRepository.GetAllRooms();
         }
 
         public void OnPost()
         {
-            RoomInformation = _roomRepository.FindRooms(room =>
+            RoomList = _roomRepository.FindRooms(room =>
             {
                 if (room.RoomStatus == (byte)Status.Deleted)
                 {
                     return false;
                 }
-                if (!string.IsNullOrEmpty(RoomNumber) && !room.RoomNumber.Contains(RoomNumber))
+                if (!string.IsNullOrEmpty(RoomNumber) && !room.RoomNumber.Contains(RoomNumber, StringComparison.OrdinalIgnoreCase))
                 {
                     return false;
                 }
-                if (!string.IsNullOrEmpty(RoomDetailDescription) && !(room.RoomDetailDescription ?? string.Empty).Contains(RoomDetailDescription))
+                if (!string.IsNullOrEmpty(RoomDetailDescription)
+                    && !(room.RoomDetailDescription ?? string.Empty).Contains(RoomDetailDescription, StringComparison.OrdinalIgnoreCase))
                 {
                     return false;
                 }

@@ -2,25 +2,24 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BusinessObjects;
 using BusinessObjects.Enums;
+using PhamPhucTuanMinhRazorPages.Constants;
 using PhamPhucTuanMinhRazorPages.Filters;
 using Repositories;
 
 namespace PhamPhucTuanMinhRazorPages.Pages.BookingReservations
 {
-    [Admin]
-    public class IndexModel : PageModel
+    [Customer]
+    public class BookingHistoryModel : PageModel
     {
         private readonly IReservationRepository _reservationRepository;
 
-        public IndexModel(IReservationRepository reservationRepository)
+        public BookingHistoryModel(IReservationRepository reservationRepository)
         {
             _reservationRepository = reservationRepository;
         }
 
         public IList<BookingReservation> BookingList { get; set; } = new List<BookingReservation>();
 
-        [BindProperty]
-        public string? CustomerName { get; set; }
         [BindProperty]
         public DateTime? BookingDateFrom { get; set; }
         [BindProperty]
@@ -32,19 +31,16 @@ namespace PhamPhucTuanMinhRazorPages.Pages.BookingReservations
 
         public void OnGet()
         {
-            BookingList = _reservationRepository.GetAllReservation();
+            int userId = HttpContext.Session.GetInt32(SessionConst.UserIdKey) ?? -1;
+            BookingList = _reservationRepository.FindReservations(res => res.CustomerId == userId);
         }
 
         public void OnPost()
         {
+            int userId = HttpContext.Session.GetInt32(SessionConst.UserIdKey) ?? -1;
             BookingList = _reservationRepository.FindReservations(res =>
             {
-                if (res.BookingStatus == (byte)Status.Deleted)
-                {
-                    return false;
-                }
-                if (!string.IsNullOrEmpty(CustomerName)
-                    && !(res.Customer.CustomerFullName ?? string.Empty).Contains(CustomerName, StringComparison.OrdinalIgnoreCase))
+                if (res.BookingStatus == (byte)Status.Deleted || res.CustomerId != userId)
                 {
                     return false;
                 }

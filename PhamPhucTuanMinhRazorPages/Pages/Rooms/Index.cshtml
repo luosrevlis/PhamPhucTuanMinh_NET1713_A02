@@ -22,35 +22,27 @@
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.RoomInformation[0].RoomNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RoomInformation[0].RoomMaxCapacity)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RoomInformation[0].RoomPricePerDay)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RoomInformation[0].RoomType)
-            </th>
+            <th>Room Number</th>
+            <th>Room Type</th>
+            <th>Room Capacity</th>
+            <th>Room Price</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.RoomInformation) {
+@foreach (var item in Model.RoomList) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.RoomNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RoomType.RoomTypeName)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.RoomMaxCapacity)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.RoomPricePerDay)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RoomType.RoomTypeName)
             </td>
             <td>
                 <a asp-page="Edit" asp-route-id="@item.RoomId">Edit</a> |

@@ -28,29 +28,30 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.CustomerList) {
-        <tr>
-            <td>
-                @item.EmailAddress
-            </td>
-            <td>
-                @item.CustomerFullName
-            </td>
-            <td>
-                @item.Telephone
-            </td>
-            <td>
-                @if (item.CustomerBirthday.HasValue)
-                {
-                    @item.CustomerBirthday.Value.ToShortDateString()
-                }
-            </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.CustomerId">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.CustomerId">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.CustomerId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model.CustomerList)
+        {
+            <tr>
+                <td>
+                    @item.EmailAddress
+                </td>
+                <td>
+                    @item.CustomerFullName
+                </td>
+                <td>
+                    @item.Telephone
+                </td>
+                <td>
+                    @if (item.CustomerBirthday.HasValue)
+                    {
+                        @item.CustomerBirthday.Value.ToShortDateString()
+                    }
+                </td>
+                <td>
+                    <a asp-page="./Edit" asp-route-id="@item.CustomerId">Edit</a> |
+                    <a asp-page="./Details" asp-route-id="@item.CustomerId">Details</a> |
+                    <a asp-page="./Delete" asp-route-id="@item.CustomerId">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

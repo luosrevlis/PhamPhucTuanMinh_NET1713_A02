@@ -1,25 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BusinessObjects;
-using BusinessObjects.Enums;
+using PhamPhucTuanMinhRazorPages.Constants;
+using PhamPhucTuanMinhRazorPages.Filters;
 using Repositories;
 
-namespace PhamPhucTuanMinhRazorPages.Pages
+namespace PhamPhucTuanMinhRazorPages.Pages.Customers
 {
-    public class RegisterModel : PageModel
+    [Customer]
+    public class EditProfileModel : PageModel
     {
         private readonly ICustomerRepository _customerRepository;
         private readonly IConfiguration _configuration;
 
-        public RegisterModel(ICustomerRepository customerRepository, IConfiguration configuration)
+        public EditProfileModel(ICustomerRepository customerRepository, IConfiguration configuration)
         {
             _customerRepository = customerRepository;
             _configuration = configuration;
-        }
-
-        public IActionResult OnGet()
-        {
-            return Page();
         }
 
         [BindProperty]
@@ -27,11 +24,24 @@ namespace PhamPhucTuanMinhRazorPages.Pages
         [BindProperty]
         public string RetypePassword { get; set; } = string.Empty;
 
+        public IActionResult OnGet()
+        {
+            int id = HttpContext.Session.GetInt32(SessionConst.UserIdKey) ?? -1;
+            var customer = _customerRepository.FindCustomerById((int)id);
+            if (customer == null)
+            {
+                return NotFound();
+            }
+            customer.Password = string.Empty;
+            Customer = customer;
+            return Page();
+        }
+
         public IActionResult OnPost()
         {
-            if (string.IsNullOrEmpty(Customer.EmailAddress) || string.IsNullOrEmpty(Customer.Password))
+            if (string.IsNullOrEmpty(Customer.EmailAddress))
             {
-                ModelState.AddModelError(string.Empty, "Email and password cannot be empty!");
+                ModelState.AddModelError("Customer.EmailAddress", "Email cannot be empty!");
             }
             if (!RetypePassword.Equals(Customer.Password))
             {
@@ -45,17 +55,19 @@ namespace PhamPhucTuanMinhRazorPages.Pages
             {
                 return Page();
             }
-            Customer cleanCustomer = new()
+            int id = HttpContext.Session.GetInt32(SessionConst.UserIdKey) ?? -1;
+            var customerToUpdate = _customerRepository.FindCustomerById((int)id);
+            if (customerToUpdate == null)
             {
-                EmailAddress = Customer.EmailAddress,
-                Password = Customer.Password,
-                CustomerFullName = Customer.CustomerFullName,
-                Telephone = Customer.Telephone,
-                CustomerBirthday = Customer.CustomerBirthday,
-                CustomerStatus = (byte)Status.NotDeleted
-            };
-            _customerRepository.AddCustomer(cleanCustomer);
-            return RedirectToPage("Login");
+                return NotFound();
+            }
+            customerToUpdate.EmailAddress = Customer.EmailAddress;
+            customerToUpdate.Password = Customer.Password;
+            customerToUpdate.CustomerFullName = Customer.CustomerFullName;
+            customerToUpdate.Telephone = Customer.Telephone;
+            customerToUpdate.CustomerBirthday = Customer.CustomerBirthday;
+            _customerRepository.UpdateCustomer(customerToUpdate);
+            return RedirectToPage("Index");
         }
 
         private bool CheckAdmin()

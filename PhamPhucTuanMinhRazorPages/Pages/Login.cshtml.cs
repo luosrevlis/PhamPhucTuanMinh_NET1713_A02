@@ -71,6 +71,7 @@ namespace PhamPhucTuanMinhRazorPages.Pages
             {
                 return false;
             }
+            Customer = customer;
             return true;
         }
     }

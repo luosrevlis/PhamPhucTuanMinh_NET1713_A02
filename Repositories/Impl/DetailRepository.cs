@@ -1,5 +1,6 @@
 ﻿using BusinessObjects;
 using DAOs;
+using Microsoft.EntityFrameworkCore;
 
 namespace Repositories.Impl
 {
@@ -14,7 +15,12 @@ namespace Repositories.Impl
 
         public List<BookingDetail> FindBookingDetails(Func<BookingDetail, bool> predicate)
         {
-            return _detailDAO.GetAll().Where(predicate).ToList();
+            return _detailDAO.GetAll()
+                .Include(details => details.Room)
+                .ThenInclude(room => room.RoomType)
+                .Where(predicate)
+                .OrderBy(details => details.Room.RoomNumber)
+                .ToList();
         }
     }
 }

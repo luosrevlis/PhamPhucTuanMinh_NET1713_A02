@@ -54,7 +54,8 @@ namespace Repositories.Impl
         public List<Customer> FindCustomersByName(string name)
         {
             return _customerDao.GetAll()
-                .Where(customer => (customer.CustomerFullName ?? string.Empty).Contains(name) && customer.CustomerStatus != (byte)Status.Deleted)
+                .Where(customer => (customer.CustomerFullName ?? string.Empty).Contains(name, StringComparison.OrdinalIgnoreCase)
+                    && customer.CustomerStatus != (byte)Status.Deleted)
                 .OrderBy(customer => customer.CustomerFullName)
                 .ToList();
         }

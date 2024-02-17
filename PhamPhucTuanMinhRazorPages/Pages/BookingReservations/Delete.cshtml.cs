@@ -1,63 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using BusinessObjects;
-using DAOs;
+using Repositories;
+using PhamPhucTuanMinhRazorPages.Filters;
 
 namespace PhamPhucTuanMinhRazorPages.Pages.BookingReservations
 {
+    [Admin]
     public class DeleteModel : PageModel
     {
-        private readonly DAOs.FuminiHotelManagementContext _context;
+        private readonly IReservationRepository _reservationRepository;
 
-        public DeleteModel(DAOs.FuminiHotelManagementContext context)
+        public DeleteModel(IReservationRepository reservationRepository)
         {
-            _context = context;
+            _reservationRepository = reservationRepository;
         }
 
         [BindProperty]
-      public BookingReservation BookingReservation { get; set; } = default!;
+        public BookingReservation BookingReservation { get; set; } = new();
 
-        public async Task<IActionResult> OnGetAsync(int? id)
+        public IActionResult OnGet(int? id)
         {
-            if (id == null || _context.BookingReservations == null)
+            if (id == null)
             {
                 return NotFound();
             }
-
-            var bookingreservation = await _context.BookingReservations.FirstOrDefaultAsync(m => m.BookingReservationId == id);
-
-            if (bookingreservation == null)
+            var res = _reservationRepository.FindReservationById((int)id);
+            if (res == null)
             {
                 return NotFound();
             }
-            else 
-            {
-                BookingReservation = bookingreservation;
-            }
+            BookingReservation = res;
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(int? id)
+        public IActionResult OnPost(int? id)
         {
-            if (id == null || _context.BookingReservations == null)
+            if (id == null)
             {
                 return NotFound();
             }
-            var bookingreservation = await _context.BookingReservations.FindAsync(id);
-
-            if (bookingreservation != null)
-            {
-                BookingReservation = bookingreservation;
-                _context.BookingReservations.Remove(BookingReservation);
-                await _context.SaveChangesAsync();
-            }
-
-            return RedirectToPage("./Index");
+            _reservationRepository.DeleteReservation((int)id);
+            return RedirectToPage("Index");
         }
     }
 }

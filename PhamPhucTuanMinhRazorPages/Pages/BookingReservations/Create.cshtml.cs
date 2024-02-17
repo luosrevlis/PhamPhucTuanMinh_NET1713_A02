@@ -1,46 +1,61 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using BusinessObjects;
-using DAOs;
+using PhamPhucTuanMinhRazorPages.Filters;
+using Repositories;
+using PhamPhucTuanMinhRazorPages.Constants;
+using PhamPhucTuanMinhRazorPages.Enums;
 
 namespace PhamPhucTuanMinhRazorPages.Pages.BookingReservations
 {
+    [Authenticated]
     public class CreateModel : PageModel
     {
-        private readonly DAOs.FuminiHotelManagementContext _context;
+        private readonly ICustomerRepository _customerRepository;
 
-        public CreateModel(DAOs.FuminiHotelManagementContext context)
+        public CreateModel(ICustomerRepository customerRepository)
         {
-            _context = context;
+            _customerRepository = customerRepository;
         }
 
         public IActionResult OnGet()
         {
-        ViewData["CustomerId"] = new SelectList(_context.Customers, "CustomerId", "EmailAddress");
+            int userRole = HttpContext.Session.GetInt32(SessionConst.UserRoleKey) ?? (int)UserRole.None;
+            if (userRole == (int)UserRole.Admin)
+            {
+                ViewData["Customers"] = new SelectList(_customerRepository.GetAllCustomers(), "CustomerId", "EmailAddress");
+            }
+            else if (userRole == (int)UserRole.Customer)
+            {
+                CustomerId = HttpContext.Session.GetInt32(SessionConst.UserIdKey) ?? -1;
+            }
             return Page();
         }
 
         [BindProperty]
-        public BookingReservation BookingReservation { get; set; } = default!;
+        public int CustomerId { get; set; }
+        [BindProperty]
+        public DateTime StayStart { get; set; }
+        [BindProperty]
+        public DateTime StayEnd { get; set; }
         
-
-        // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
-        public async Task<IActionResult> OnPostAsync()
+        public IActionResult OnPost()
         {
-          if (!ModelState.IsValid || _context.BookingReservations == null || BookingReservation == null)
+            if (StayStart < DateTime.Now || StayEnd < DateTime.Now)
             {
+                ModelState.AddModelError(string.Empty, "Staying period cannot be in the past!");
+            }
+            if (StayStart >= StayEnd)
+            {
+                ModelState.AddModelError(string.Empty, "The end date must be at least 1 day after the start date!");
+            }
+            if (!ModelState.IsValid)
+            {
+                ViewData["Customers"] = new SelectList(_customerRepository.GetAllCustomers(), "CustomerId", "EmailAddress");
                 return Page();
             }
-
-            _context.BookingReservations.Add(BookingReservation);
-            await _context.SaveChangesAsync();
-
-            return RedirectToPage("./Index");
+            return RedirectToPage("AvailableRooms", new { customerId = CustomerId, stayStart = StayStart, stayEnd = StayEnd });
         }
     }
 }

@@ -10,5 +10,6 @@ namespace Repositories
         void AddReservation(BookingReservation reservation);
         void UpdateReservation(BookingReservation reservation);
         void DeleteReservation(int id);
+        int GetNextId();
     }
 }

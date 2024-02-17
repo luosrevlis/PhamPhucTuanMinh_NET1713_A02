@@ -1,0 +1,60 @@
+﻿@page
+@model BookingReservations.AvailableRoomsModel
+
+@{
+    ViewData["Title"] = "Available Rooms";
+    string stayStart = HttpContext.Session.GetString(Constants.SessionConst.StayStartKey) ?? string.Empty;
+    string stayEnd = HttpContext.Session.GetString(Constants.SessionConst.StayEndKey) ?? string.Empty;
+    int timeByDays = (int)(DateTime.Parse(stayEnd) - DateTime.Parse(stayStart)).TotalDays;
+}
+
+<h1>Available Rooms</h1>
+<h4>Period: @stayStart to @stayEnd</h4>
+<form method="post">
+    <input type="hidden" name="customerId" value="@ViewData["CustomerId"]" />
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Room Number</th>
+                <th>Room Type</th>
+                <th>Room Capacity</th>
+                <th>Room Price</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.RoomList)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.RoomNumber)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.RoomType.RoomTypeName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.RoomMaxCapacity)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.RoomPricePerDay)
+                    </td>
+                    <td>
+                        <input id="room-@item.RoomId" type="checkbox" asp-for="SelectedRooms[item.RoomId]" onchange="ChangeTotalPrice(@item.RoomPricePerDay)" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <h4>Total price: <span id="total-price">0</span></h4>
+    <input type="submit" value="Book rooms" />
+</form>
+<script>
+    function ChangeTotalPrice(roomPricePerDay) {
+        if (event.target.checked == false) {
+            roomPricePerDay = -roomPricePerDay;
+        }
+        var currPrice = parseInt(document.getElementById("total-price").innerHTML);
+        currPrice += roomPricePerDay * @timeByDays;
+        document.getElementById("total-price").innerHTML = currPrice;
+    }
+</script>

@@ -1,18 +1,17 @@
 ﻿@page
-@model BookingReservations.IndexModel
+@model BookingReservations.BookingHistoryModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Booking History";
 }
 
-<h1>Index</h1>
+<h1>Booking History</h1>
 
 <p>
     <a asp-page="Create">Create New</a>
 </p>
 <div>
     <form method="post">
-        <p>Customer: <input asp-for="CustomerName" /></p>
         <p>Booking date from <input asp-for="BookingDateFrom" /> to <input asp-for="BookingDateTo" /></p>
         <p>Price from <input asp-for="PriceFrom" /> to <input asp-for="PriceTo" /></p>
         <input type="submit" value="Search" />
@@ -21,7 +20,6 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Customer</th>
             <th>Booking Date</th>
             <th>Total Price</th>
             <th></th>
@@ -31,9 +29,6 @@
         @foreach (var item in Model.BookingList)
         {
             <tr>
-                <td>
-                    @item.Customer.EmailAddress
-                </td>
                 <td>
                     @if (item.BookingDate.HasValue)
                     {
@@ -51,3 +46,6 @@
         }
     </tbody>
 </table>
+<div>
+    <a asp-page="../CustomerMenu">Back to Menu</a>
+</div>

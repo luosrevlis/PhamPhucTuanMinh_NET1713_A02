@@ -11,7 +11,7 @@ namespace PhamPhucTuanMinhRazorPages.Filters
         {
             if (context.HttpContext.Session.GetInt32(SessionConst.UserRoleKey) != (int)UserRole.Customer)
             {
-                //context.Result = new UnauthorizedResult();
+                context.Result = new UnauthorizedResult();
             }
             base.OnResultExecuting(context);
         }

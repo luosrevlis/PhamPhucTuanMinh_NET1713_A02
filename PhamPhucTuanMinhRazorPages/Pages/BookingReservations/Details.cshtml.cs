@@ -1,42 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using BusinessObjects;
-using DAOs;
+using PhamPhucTuanMinhRazorPages.Filters;
+using Repositories;
 
 namespace PhamPhucTuanMinhRazorPages.Pages.BookingReservations
 {
+    [Authenticated]
     public class DetailsModel : PageModel
     {
-        private readonly DAOs.FuminiHotelManagementContext _context;
+        private readonly IReservationRepository _reservationRepository;
+        private readonly IDetailRepository _detailRepository;
 
-        public DetailsModel(DAOs.FuminiHotelManagementContext context)
+        public DetailsModel(IReservationRepository reservationRepository, IDetailRepository detailRepository)
         {
-            _context = context;
+            _reservationRepository = reservationRepository;
+            _detailRepository = detailRepository;
         }
 
-      public BookingReservation BookingReservation { get; set; } = default!; 
+        public BookingReservation BookingReservation { get; set; } = new();
+        public IList<BookingDetail> Details { get; set; } = new List<BookingDetail>();
 
-        public async Task<IActionResult> OnGetAsync(int? id)
+        public IActionResult OnGet(int? id)
         {
-            if (id == null || _context.BookingReservations == null)
+            if (id == null)
             {
                 return NotFound();
             }
-
-            var bookingreservation = await _context.BookingReservations.FirstOrDefaultAsync(m => m.BookingReservationId == id);
-            if (bookingreservation == null)
+            var res = _reservationRepository.FindReservationById((int)id);
+            if (res == null)
             {
                 return NotFound();
             }
-            else 
-            {
-                BookingReservation = bookingreservation;
-            }
+            BookingReservation = res;
+            Details = _detailRepository.FindBookingDetails(det => det.BookingReservationId == res.BookingReservationId);
             return Page();
         }
     }

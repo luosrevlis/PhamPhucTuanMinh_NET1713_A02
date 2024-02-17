@@ -63,6 +63,11 @@ namespace Repositories.Impl
                 .ToList();
         }
 
+        public int GetNextId()
+        {
+            return _reservationDAO.GetAll().Max(res => res.BookingReservationId) + 1;
+        }
+
         public void UpdateReservation(BookingReservation reservation)
         {
             _reservationDAO.Update(reservation);
